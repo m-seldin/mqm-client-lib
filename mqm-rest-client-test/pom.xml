@@ -2,13 +2,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>mqm-rest-client-test</artifactId>
 	<name>MQM REST Client - Integration Tests</name>
+
+	<artifactId>mqm-rest-client-test</artifactId>
+
 	<parent>
-		<groupId>com.hp.mqm</groupId>
-		<artifactId>mqm-client</artifactId>
-		<version>12.53.20-SNAPSHOT</version>
+		<groupId>com.hpe.alm.octane.plugins</groupId>
+		<artifactId>hpe-mqm-client-lib</artifactId>
+		<version>1.0</version>
 	</parent>
+
 	<properties>
 		<DEPLOY_TARGET>localhost</DEPLOY_TARGET>
 		<JETTY_PORT>8081</JETTY_PORT>
@@ -24,7 +27,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.hp.mqm</groupId>
+			<groupId>com.hpe.alm.octane.plugins</groupId>
 			<artifactId>mqm-rest-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
