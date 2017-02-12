@@ -212,7 +212,7 @@ public abstract class AbstractMqmRestClient implements BaseMqmRestClient {
 		HttpResponse response = null;
 		try {
 			response = execute(request);
-			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_FOUND) {
 				throw new SharedSpaceNotExistException("Cannot connect to given shared space.");
 			} else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_FORBIDDEN) {
 				throw new AuthorizationException("Provided credentials are not sufficient for requested resource");
