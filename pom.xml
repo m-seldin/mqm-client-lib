@@ -97,4 +97,12 @@
 
         </dependencies>
     </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-adm-maven</id>
+            <name>adm-maven</name>
+            <url>https://api.bintray.com/maven/adm/maven/mqm-client-lib/</url>
+        </repository>
+    </distributionManagement>
 </project>
