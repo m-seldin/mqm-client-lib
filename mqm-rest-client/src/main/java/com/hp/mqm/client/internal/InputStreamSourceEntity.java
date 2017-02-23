@@ -16,8 +16,8 @@
 package com.hp.mqm.client.internal;
 
 import com.hp.mqm.client.InputStreamSource;
-import com.hp.mqm.org.apache.http.entity.AbstractHttpEntity;
-import com.hp.mqm.org.apache.http.entity.ContentType;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.ContentType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ import java.io.OutputStream;
 
 public class InputStreamSourceEntity extends AbstractHttpEntity {
 
-    private int OUTPUT_BUFFER_SIZE = 2048;
+    private final static int INNER_OUTPUT_BUFFER_SIZE = 2048;
 
     private InputStreamSource inputStreamSource;
     private final long length;
@@ -84,7 +84,7 @@ public class InputStreamSourceEntity extends AbstractHttpEntity {
         }
         final InputStream inputStream = getContent();
         try {
-            final byte[] buffer = new byte[OUTPUT_BUFFER_SIZE];
+            final byte[] buffer = new byte[INNER_OUTPUT_BUFFER_SIZE];
             int l;
             if (this.length < 0) {
                 while ((l = inputStream.read(buffer)) != -1) {
@@ -93,7 +93,7 @@ public class InputStreamSourceEntity extends AbstractHttpEntity {
             } else {
                 long remaining = this.length;
                 while (remaining > 0) {
-                    l = inputStream.read(buffer, 0, (int)Math.min(OUTPUT_BUFFER_SIZE, remaining));
+                    l = inputStream.read(buffer, 0, (int)Math.min(INNER_OUTPUT_BUFFER_SIZE, remaining));
                     if (l == -1) {
                         break;
                     }

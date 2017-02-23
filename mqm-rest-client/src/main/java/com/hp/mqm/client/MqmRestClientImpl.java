@@ -18,17 +18,17 @@ package com.hp.mqm.client;
 import com.hp.mqm.client.exception.*;
 import com.hp.mqm.client.exception.FileNotFoundException;
 import com.hp.mqm.client.model.*;
-import com.hp.mqm.org.apache.http.HttpResponse;
-import com.hp.mqm.org.apache.http.HttpStatus;
-import com.hp.mqm.org.apache.http.client.methods.HttpDelete;
-import com.hp.mqm.org.apache.http.client.methods.HttpGet;
-import com.hp.mqm.org.apache.http.client.methods.HttpPost;
-import com.hp.mqm.org.apache.http.client.methods.HttpPut;
-import com.hp.mqm.org.apache.http.client.utils.HttpClientUtils;
-import com.hp.mqm.org.apache.http.entity.ByteArrayEntity;
-import com.hp.mqm.org.apache.http.entity.ContentType;
-import com.hp.mqm.org.apache.http.entity.StringEntity;
-import com.hp.mqm.org.apache.http.protocol.HTTP;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.protocol.HTTP;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONNull;
@@ -670,7 +670,7 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 	public JSONObject postTest(String uftTestJson, HashMap<String, String> uftTestData, String serverURL) throws UnsupportedEncodingException {
 		HttpPost request = new HttpPost(serverURL + "/tests");
 		request.setHeader(HTTP.CONTENT_TYPE, "application/json");
-		request.setHeader("Accept", "application/json");
+		request.setHeader(HEADER_ACCEPT, "application/json");
 
 		request.setEntity(new StringEntity(uftTestJson));
 		HttpResponse response;
@@ -699,7 +699,7 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 		HttpResponse response;
 		request = new HttpPost(serverURL + "/attachments");
 		request.setHeader(HTTP.CONTENT_TYPE, "multipart/form-data; boundary=Boundary_1_418958713_1441798856288");
-		request.setHeader("Accept", "application/json");
+		request.setHeader(HEADER_ACCEPT, "application/json");
 		description = "This file contains UFT parameters information extracted via HPE Octane UFT Tests Scanner";
 		content = resourceMtrAsJSON;
 		String attachment_name = "test_parameters.txt";

@@ -24,33 +24,33 @@ import com.hp.mqm.client.exception.RequestException;
 import com.hp.mqm.client.exception.ServerException;
 import com.hp.mqm.client.exception.SharedSpaceNotExistException;
 import com.hp.mqm.client.model.PagedList;
-import com.hp.mqm.org.apache.http.*;
-import com.hp.mqm.org.apache.http.client.CookieStore;
-import com.hp.mqm.org.apache.http.client.CredentialsProvider;
-import com.hp.mqm.org.apache.http.client.config.RequestConfig;
-import com.hp.mqm.org.apache.http.client.protocol.HttpClientContext;
-import com.hp.mqm.org.apache.http.cookie.Cookie;
-import com.hp.mqm.org.apache.http.entity.ContentType;
-import com.hp.mqm.org.apache.http.entity.StringEntity;
-import com.hp.mqm.org.apache.http.impl.client.BasicCookieStore;
-import com.hp.mqm.org.apache.http.impl.client.BasicCredentialsProvider;
-import com.hp.mqm.org.apache.http.impl.client.CloseableHttpClient;
-import com.hp.mqm.org.apache.http.impl.client.HttpClients;
-import com.hp.mqm.org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import com.hp.mqm.org.apache.http.protocol.BasicHttpContext;
-import com.hp.mqm.org.apache.http.protocol.HttpContext;
+import org.apache.http.*;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import com.hp.mqm.org.apache.http.auth.AuthScope;
-import com.hp.mqm.org.apache.http.auth.Credentials;
-import com.hp.mqm.org.apache.http.auth.UsernamePasswordCredentials;
-import com.hp.mqm.org.apache.http.client.methods.HttpGet;
-import com.hp.mqm.org.apache.http.client.methods.HttpPost;
-import com.hp.mqm.org.apache.http.client.methods.HttpUriRequest;
-import com.hp.mqm.org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.HttpClientUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -396,7 +396,7 @@ public abstract class AbstractMqmRestClient implements BaseMqmRestClient {
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 				throw createRequestException("Entity retrieval failed", response);
 			}
-			String entitiesJson = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+			String entitiesJson = IOUtils.toString(response.getEntity().getContent(), URI_PARAM_ENCODING);
 			JSONObject entities = JSONObject.fromObject(entitiesJson);
 
 			LinkedList<E> items = new LinkedList<>();
@@ -444,7 +444,7 @@ public abstract class AbstractMqmRestClient implements BaseMqmRestClient {
 		String stackTrace = null;
 		String errorCode = null;
 		try {
-			String json = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+			String json = IOUtils.toString(response.getEntity().getContent(), URI_PARAM_ENCODING);
 			JSONObject jsonObject = JSONObject.fromObject(json);
 			if (jsonObject.has("error_code") && jsonObject.has("description")) {
 				// exception response
