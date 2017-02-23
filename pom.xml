@@ -33,6 +33,7 @@
         <mockito.core.version>2.0.97-beta</mockito.core.version>
         <surefire.version>2.18.1</surefire.version>
         <failsafe.version>2.18.1</failsafe.version>
+        <baseNexusURL>http://mydtbld0051.hpeswlab.net:8081/nexus</baseNexusURL>
     </properties>
 
     <dependencyManagement>
@@ -103,11 +104,26 @@
     </repositories>
 
 
-    <distributionManagement>
-        <repository>
-            <id>bintray-adm-maven</id>
-            <name>adm-maven</name>
-            <url>https://api.bintray.com/maven/adm/maven/mqm-client-lib/</url>
-        </repository>
-    </distributionManagement>
+    <profiles>
+        <profile>
+            <id>quick</id>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>mqm-snapshots</id>
+                    <name>Snapshot repository</name>
+                    <url>${baseNexusURL}/content/repositories/mqm-snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>bintray-release</id>
+            <distributionManagement>
+                <repository>
+                    <id>bintray-adm-maven</id>
+                    <name>adm-maven</name>
+                    <url>https://api.bintray.com/maven/adm/maven/mqm-client-lib/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>
