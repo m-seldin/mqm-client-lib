@@ -106,7 +106,7 @@
 
     <profiles>
         <profile>
-            <id>quick</id>
+            <id>snapshot</id>
             <distributionManagement>
                 <snapshotRepository>
                     <id>mqm-snapshots</id>
