@@ -1,16 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
-	<name>MQM REST Client - Integration Tests</name>
+	<parent>
+		<groupId>com.hpe.adm.octane.ciplugins</groupId>
+		<artifactId>hpe-mqm-client-lib</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
 
 	<artifactId>mqm-rest-client-test</artifactId>
 
-	<parent>
-		<groupId>com.hpe.alm.octane.plugins</groupId>
-		<artifactId>hpe-mqm-client-lib</artifactId>
-		<version>1.0</version>
-	</parent>
+	<name>MQM REST Client - Integration Tests</name>
 
 	<properties>
 		<DEPLOY_TARGET>localhost</DEPLOY_TARGET>
@@ -27,7 +26,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.hpe.alm.octane.plugins</groupId>
+			<groupId>com.hpe.adm.octane.ciplugins</groupId>
 			<artifactId>mqm-rest-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -35,6 +34,15 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
