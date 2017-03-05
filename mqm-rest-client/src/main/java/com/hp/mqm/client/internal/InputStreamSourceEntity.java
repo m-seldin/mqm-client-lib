@@ -16,8 +16,8 @@
 package com.hp.mqm.client.internal;
 
 import com.hp.mqm.client.InputStreamSource;
-import com.hp.mqm.org.apache.http.entity.AbstractHttpEntity;
-import com.hp.mqm.org.apache.http.entity.ContentType;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.ContentType;
 
 import java.io.IOException;
 import java.io.InputStream;
