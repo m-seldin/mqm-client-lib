@@ -34,12 +34,10 @@ import java.util.List;
 
 /**
  * Client for connection to MQM public API. It wraps whole http communication with MQM server. Client handles login automatically.
- * When client is not intended to use anymore or for a long time, method {@link #release()} must be called.
- *
- *
+ * When client is not intended to use anymore or for a long time, method release() must be called.
  * All methods can throw {@link com.hp.mqm.client.exception.RequestException} when unexpected result is returned from
  * MQM server and {@link com.hp.mqm.client.exception.RequestErrorException} in case of IO error or error in the HTTP protocol.
- * Because client cares about login automatically all methods (except {@link #release()}) can
+ * Because client cares about login automatically all methods (except release()) can
  * throw {@link com.hp.mqm.client.exception.LoginException} (as a special case of RequestException) in case authentication failure and
  * {@link com.hp.mqm.client.exception.LoginErrorException} (as a special case of RequestErrorException) in case of IO error or
  * error in the HTTP protocol during authentication.
