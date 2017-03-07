@@ -355,9 +355,8 @@ public abstract class AbstractMqmRestClient implements BaseMqmRestClient {
 	/**
 	 * Invokes {@link org.apache.http.client.HttpClient#execute(org.apache.http.client.methods.HttpUriRequest)}
 	 * with given request and it does login if it is necessary.
-	 * <p>
+	 *
 	 * Method does not support request with non-repeatable entity (see {@link HttpEntity#isRepeatable()}).
-	 * </p>
 	 *
 	 * @param request which should be executed
 	 * @return response for given request
