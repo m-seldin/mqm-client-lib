@@ -6,13 +6,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.hpe.adm.octane.ciplugins</groupId>
     <artifactId>hpe-mqm-client-lib</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>MQM Client librabry</name>
     <description>Lagcy mqm sdk for jenkins plugin</description>
 
-    <url></url>
+    <url>https://github.com/HPSoftware/mqm-client-lib</url>
     <organization>
         <name>HPE</name>
     </organization>
@@ -73,6 +73,7 @@
     <properties>
         <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
         <maven.jar.plugin.version>3.0.2</maven.jar.plugin.version>
+        <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
         <jdk.version>1.7</jdk.version>
         <httpclient-hp.version>4.5.1-hp-1</httpclient-hp.version>
         <httpclient.version>4.5.1</httpclient.version>
