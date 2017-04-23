@@ -713,6 +713,34 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
     }
 
 	@Override
+	public JSONObject updateTest(long workspaceId, long id, String uftTestJson) throws UnsupportedEncodingException {
+		URI uri = getEntityIdURI(URI_TESTS, id, workspaceId);
+		HttpPut request = new HttpPut(uri);
+		request.setHeader(HTTP.CONTENT_TYPE, "application/json");
+		request.setHeader("Accept", "application/json");
+
+		request.setEntity(new StringEntity(uftTestJson));
+		HttpResponse response;
+		try {
+			response = execute(request);
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
+				throw new TemporarilyUnavailableException("Service not available");
+			}
+			if (statusCode != HttpStatus.SC_OK) {
+				throw createRequestException("Test put failed", response);
+			}
+			String json = IOUtils.toString(response.getEntity().getContent());
+			return JSONObject.fromObject(json);
+		} catch (java.io.FileNotFoundException e) {
+			throw new FileNotFoundException("Cannot find test result file.", e);
+		} catch (IOException e) {
+			throw new RequestErrorException("Cannot post test results to MQM.", e);
+		}
+	}
+
+
+	@Override
 	public PagedList<Test> deleteTests(long workspaceId, Collection<Long> testIds){
 		//query="id=3011||id=3012"
 
@@ -725,7 +753,6 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 			idConditions.add(condition("id", id));
 		}
 		String finalCondition = StringUtils.join(idConditions,"||");
-
 
 
 		URI uri = getEntityURI(URI_TESTS, Arrays.asList(finalCondition),null, workspaceId, null, null, null);

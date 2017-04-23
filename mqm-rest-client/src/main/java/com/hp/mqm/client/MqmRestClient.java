@@ -253,6 +253,8 @@ public interface MqmRestClient extends BaseMqmRestClient {
 
 	PagedList<Test> deleteTests(long workspaceId, Collection<Long> testIds);
 
+	JSONObject updateTest(long workspaceId, long id, String uftTestJson) throws UnsupportedEncodingException;
+
 	/**
 	 * @param testId
 	 * @param resourceMtrAsJSON

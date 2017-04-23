@@ -28,7 +28,7 @@ import org.apache.http.*;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
@@ -48,9 +48,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.HttpClientUtils;
 
 import java.io.IOException;
@@ -421,6 +418,22 @@ public abstract class AbstractMqmRestClient implements BaseMqmRestClient {
 		}
 	}
 
+	protected <E> PagedList<E> updateEntities(URI uri, EntityFactory<E> factory) {
+		HttpPut request = new HttpPut(uri);
+		HttpResponse response = null;
+		try {
+			response = execute(request);
+			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+				throw createRequestException("Entity update failed", response);
+			}
+			return convertResponceToPagedList(factory, 0, response);
+		} catch (IOException e) {
+			throw new RequestErrorException("Cannot update entity.", e);
+		} finally {
+			HttpClientUtils.closeQuietly(response);
+		}
+	}
+
 	private <E> PagedList<E> convertResponceToPagedList(EntityFactory<E> factory, int offset, HttpResponse response) throws IOException {
 		String entitiesJson = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 		JSONObject entities = JSONObject.fromObject(entitiesJson);
@@ -468,6 +481,20 @@ public abstract class AbstractMqmRestClient implements BaseMqmRestClient {
 			params.put("order", orderBy);
 			template.append("&" + ORDER_BY_FRAGMENT);
 		}
+
+		if (workspaceId != null) {
+			return createWorkspaceApiUriMap(template.toString(), workspaceId, params);
+		} else {
+			return createSharedSpaceApiUriMap(template.toString(), params);
+		}
+	}
+
+	protected URI getEntityIdURI(String collection, Long id,  Long workspaceId) {
+
+		Map<String, Object> params = new HashMap<>();
+		String coll = collection +"/" + id;
+		StringBuilder template = new StringBuilder(coll);
+
 
 		if (workspaceId != null) {
 			return createWorkspaceApiUriMap(template.toString(), workspaceId, params);
