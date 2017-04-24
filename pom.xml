@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.hpe.adm.octane.ciplugins</groupId>
     <artifactId>hpe-mqm-client-lib</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>MQM Client librabry</name>
