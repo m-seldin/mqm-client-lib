@@ -18,6 +18,12 @@ package com.hp.mqm.client;
 import com.hp.mqm.client.exception.*;
 import com.hp.mqm.client.exception.FileNotFoundException;
 import com.hp.mqm.client.model.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONNull;
+import net.sf.json.JSONObject;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpDelete;
@@ -29,12 +35,6 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HTTP;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
-import net.sf.json.JSONNull;
-import net.sf.json.JSONObject;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
 import java.net.URI;
@@ -59,7 +59,6 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 	private static final String URI_WORKSPACE_BY_JOB_AND_SERVER = PREFIX_CI + "servers/{0}/jobs/{1}/workspaceId";
 	private static final String URI_BDI_CONFIGURATION = PREFIX_BDI + "configuration";
 	private static final String URI_RELEASES = "releases";
-	private static final String URI_TESTS = "tests";
 	private static final String URI_WORKSPACES = "workspaces";
 	private static final String URI_LIST_ITEMS = "list_nodes";
 	private static final String URI_METADATA_FIELDS = "metadata/fields";
@@ -669,12 +668,13 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 	}
 
 	@Override
-	public JSONObject postTest(String uftTestJson, HashMap<String, String> uftTestData, String serverURL) throws UnsupportedEncodingException {
-		HttpPost request = new HttpPost(serverURL + "/tests");
+	public JSONObject postEntities(long workspaceId, String entityCollectionName, String entityJson) throws UnsupportedEncodingException {
+		URI uri = getEntityURI(entityCollectionName, null, null, workspaceId, null, null, null);
+		HttpPost request = new HttpPost(uri);
 		request.setHeader(HTTP.CONTENT_TYPE, "application/json");
 		request.setHeader("Accept", "application/json");
 
-		request.setEntity(new StringEntity(uftTestJson));
+		request.setEntity(new StringEntity(entityJson));
 		HttpResponse response;
 		try {
 			response = execute(request);
@@ -683,43 +683,41 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 				throw new TemporarilyUnavailableException("Service not available");
 			}
 			if (statusCode != HttpStatus.SC_CREATED) {
-				throw createRequestException("Test result post failed", response);
+				throw createRequestException("Post failed", response);
 			}
 			String json = IOUtils.toString(response.getEntity().getContent());
 			return JSONObject.fromObject(json);
-		} catch (java.io.FileNotFoundException e) {
-			throw new FileNotFoundException("Cannot find test result file.", e);
 		} catch (IOException e) {
-			throw new RequestErrorException("Cannot post test results to MQM.", e);
+			throw new RequestErrorException("Cannot post entities", e);
 		}
 	}
 
 	@Override
-	public PagedList<Test> getTests(long workspaceId, Map<String, String> queryFields, Collection<String> fields) throws UnsupportedEncodingException {
+	public PagedList<Entity> getEntities(long workspaceId, String entityCollectionName, Map<String, String> queryFields, Collection<String> fields) throws UnsupportedEncodingException {
 
 		List<String> conditions = new ArrayList<>();
 
-        //add query
-        if (queryFields != null && !queryFields.isEmpty()) {
-            for (Map.Entry<String, String> entry : queryFields.entrySet()) {
-				String condition = condition(entry.getKey(),entry.getValue());
+		//add query
+		if (queryFields != null && !queryFields.isEmpty()) {
+			for (Map.Entry<String, String> entry : queryFields.entrySet()) {
+				String condition = condition(entry.getKey(), entry.getValue());
 				conditions.add(condition);
 			}
-        }
+		}
 
-		URI uri = getEntityURI(URI_TESTS, conditions,fields, workspaceId, null, null, null);
-		PagedList<Test> tests = getEntities(uri, DEFAULT_OFFSET, new TestEntityFactory());
-        return tests;
-    }
+		URI uri = getEntityURI(entityCollectionName, conditions, fields, workspaceId, null, null, null);
+		PagedList<Entity> tests = getEntities(uri, DEFAULT_OFFSET, new GeneralEntityFactory());
+		return tests;
+	}
 
 	@Override
-	public JSONObject updateTest(long workspaceId, long id, String uftTestJson) throws UnsupportedEncodingException {
-		URI uri = getEntityIdURI(URI_TESTS, id, workspaceId);
+	public JSONObject updateEntity(long workspaceId, String entityCollectionName, long entityId, String entityJson) throws UnsupportedEncodingException {
+		URI uri = getEntityIdURI(entityCollectionName, entityId, workspaceId);
 		HttpPut request = new HttpPut(uri);
 		request.setHeader(HTTP.CONTENT_TYPE, "application/json");
 		request.setHeader("Accept", "application/json");
 
-		request.setEntity(new StringEntity(uftTestJson));
+		request.setEntity(new StringEntity(entityJson));
 		HttpResponse response;
 		try {
 			response = execute(request);
@@ -732,84 +730,30 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 			}
 			String json = IOUtils.toString(response.getEntity().getContent());
 			return JSONObject.fromObject(json);
-		} catch (java.io.FileNotFoundException e) {
-			throw new FileNotFoundException("Cannot find test result file.", e);
 		} catch (IOException e) {
-			throw new RequestErrorException("Cannot post test results to MQM.", e);
+			throw new RequestErrorException("Cannot put entity to MQM.", e);
 		}
 	}
 
 
 	@Override
-	public PagedList<Test> deleteTests(long workspaceId, Collection<Long> testIds){
+	public PagedList<Entity> deleteEntities(long workspaceId, String entityCollectionName, Collection<Long> entitiesIds) {
 		//query="id=3011||id=3012"
 
-		if (testIds == null || testIds.isEmpty()) {
+		if (entitiesIds == null || entitiesIds.isEmpty()) {
 			return null;
 		}
 
 		List<String> idConditions = new ArrayList<>();
-		for(Long id : testIds){
+		for (Long id : entitiesIds) {
 			idConditions.add(condition("id", id));
 		}
-		String finalCondition = StringUtils.join(idConditions,"||");
+		String finalCondition = StringUtils.join(idConditions, "||");
 
 
-		URI uri = getEntityURI(URI_TESTS, Arrays.asList(finalCondition),null, workspaceId, null, null, null);
-		PagedList<Test> tests = deleteEntities(uri, new TestEntityFactory());
+		URI uri = getEntityURI(entityCollectionName, Arrays.asList(finalCondition), null, workspaceId, null, null, null);
+		PagedList<Entity> tests = deleteEntities(uri, new GeneralEntityFactory());
 		return tests;
-	}
-
-	public void attachUFTParametersToTest(String testId, String resourceMtrAsJSON, String serverURL) throws UnsupportedEncodingException {
-		HttpPost request;
-		String description;
-		String content;
-		HttpResponse response;
-		request = new HttpPost(serverURL + "/attachments");
-		request.setHeader(HTTP.CONTENT_TYPE, "multipart/form-data; boundary=Boundary_1_418958713_1441798856288");
-		request.setHeader("Accept", "application/json");
-		description = "This file contains UFT parameters information extracted via HPE Octane UFT Tests Scanner";
-		content = resourceMtrAsJSON;
-		String attachment_name = "test_parameters.txt";
-		String data = "{\"data\":[{\n" +
-				"--Boundary_1_418958713_1441798856288\n" +
-				"Content-Disposition: form-data; name=\"entity\"\n" +
-				"Content-Type: application/json\n" +
-				"\n" +
-				"{\n" +
-				"\"owner_test\": {\n" +
-				"         \"id\":" + testId + ",\n" +
-				"         \"type\": \"test\"\n" +
-				"         },\n" +
-				"    \"description\": \"" + description + "\"\n" +
-				"}\n" +
-				"\n" +
-				"--Boundary_1_418958713_1441798856288\n" +
-				"Content-Disposition: form-data; name=\"content\"; filename=\"" + attachment_name + "\"\n" +
-				"Content-Type: text/plain\n" +
-				"\n" +
-				content + "\n" +
-				"--Boundary_1_418958713_1441798856288--\n" +
-				"}]}\n";
-		request.setEntity(new StringEntity(data));
-		response = null;
-		try {
-			response = execute(request);
-			int statusCode = response.getStatusLine().getStatusCode();
-			if (statusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-				throw new TemporarilyUnavailableException("Service not available");
-			}
-			if (statusCode != HttpStatus.SC_CREATED) {
-				throw createRequestException("Test result post failed", response);
-			}
-			//todo Check failure case
-		} catch (java.io.FileNotFoundException e) {
-			throw new FileNotFoundException("Cannot find test result file.", e);
-		} catch (IOException e) {
-			throw new RequestErrorException("Cannot post test results to MQM.", e);
-		} finally {
-			HttpClientUtils.closeQuietly(response);
-		}
 	}
 
 	private ByteArrayEntity createGZipEntity(InputStream inputStream) {
@@ -951,14 +895,14 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 		}
 	}
 
-	private static class TestEntityFactory extends AbstractEntityFactory<Test> {
+	private static class GeneralEntityFactory extends AbstractEntityFactory<Entity> {
 
 		@Override
-		public Test doCreate(JSONObject entityObject) {
+		public Entity doCreate(JSONObject entityObject) {
 			Long id = entityObject.optLong("id",0);
 			String name = entityObject.optString("name", null);
 			String type = entityObject.optString("type", null);
-			return new Test(id, name , type);
+			return new Entity(id, name , type);
 		}
 	}
 
