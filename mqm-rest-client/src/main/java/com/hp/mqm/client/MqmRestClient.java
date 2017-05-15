@@ -19,10 +19,8 @@ import com.hp.mqm.client.model.*;
 import net.sf.json.JSONObject;
 
 import java.io.File;
-
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -240,28 +238,13 @@ public interface MqmRestClient extends BaseMqmRestClient {
 	 */
 	List<FieldMetadata> getFieldsMetadata(long workspaceId);
 
-	/**
-	 * @param uftTestJson
-	 * @param uftTestData
-	 * @param serverURL
-	 * @return
-	 * @throws UnsupportedEncodingException
-	 */
-	JSONObject postTest(String uftTestJson, HashMap<String, String> uftTestData, String serverURL) throws UnsupportedEncodingException;
+    JSONObject postEntities(long workspaceId, String entityCollectionName, String entityJson) throws UnsupportedEncodingException;
 
-	PagedList<Test> getTests(long workspaceId, Map<String, String> queryFields, Collection<String> fields) throws UnsupportedEncodingException;
+    PagedList<Entity> getEntities(long workspaceId, String entityCollectionName, Map<String, String> queryFields, Collection<String> fields) throws UnsupportedEncodingException;
 
-	PagedList<Test> deleteTests(long workspaceId, Collection<Long> testIds);
+    PagedList<Entity> deleteEntities(long workspaceId, String entityCollectionName, Collection<Long> entitiesIds);
 
-	JSONObject updateTest(long workspaceId, long id, String uftTestJson) throws UnsupportedEncodingException;
-
-	/**
-	 * @param testId
-	 * @param resourceMtrAsJSON
-	 * @param serverURL
-	 * @throws UnsupportedEncodingException
-	 */
-	void attachUFTParametersToTest(String testId, String resourceMtrAsJSON, String serverURL) throws UnsupportedEncodingException;
+    JSONObject updateEntity(long workspaceId, String entityCollectionName, long id, String entityJson) throws UnsupportedEncodingException;
 
 	/**
 	 * Sends events list to MQM [PUT request].
