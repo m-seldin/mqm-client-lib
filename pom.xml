@@ -13,6 +13,7 @@
     <description>Lagcy mqm sdk for jenkins plugin</description>
 
     <url>https://github.com/HPSoftware/mqm-client-lib</url>
+
     <organization>
         <name>HPE</name>
     </organization>
