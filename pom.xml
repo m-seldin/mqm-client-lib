@@ -63,6 +63,9 @@
     </scm>
     <issueManagement></issueManagement>
     <ciManagement></ciManagement>
+    <properties>
+        <gpg.homedir>/opt/gpg_import</gpg.homedir>
+    </properties>
 
     <distributionManagement>
         <repository>
