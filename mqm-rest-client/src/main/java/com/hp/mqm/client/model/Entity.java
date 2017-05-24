@@ -59,4 +59,9 @@ final public class Entity {
     public boolean containsField(String fieldName) {
         return entityObject.containsKey(fieldName);
     }
+
+    @Override
+    public String toString() {
+        return "#" + getId() + " - " + getName();
+    }
 }

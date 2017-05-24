@@ -19,10 +19,8 @@ import com.hp.mqm.client.model.*;
 import net.sf.json.JSONObject;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Client for connection to MQM public API. It wraps whole http communication with MQM server. Client handles login automatically.
@@ -238,15 +236,15 @@ public interface MqmRestClient extends BaseMqmRestClient {
 	 */
 	List<FieldMetadata> getFieldsMetadata(long workspaceId);
 
-    JSONObject postEntities(long workspaceId, String entityCollectionName, String entityJson) throws UnsupportedEncodingException;
+    JSONObject postEntities(long workspaceId, String entityCollectionName, String entityJson) ;
 
-    PagedList<Entity> getEntities(long workspaceId, String entityCollectionName, Collection<String> conditions, Collection<String> fields) throws UnsupportedEncodingException;
+	List<Entity> getEntities(long workspaceId, String entityCollectionName, Collection<String> conditions, Collection<String> fields);
 
     PagedList<Entity> deleteEntities(long workspaceId, String entityCollectionName, Collection<Long> entitiesIds);
 
-    JSONObject updateEntity(long workspaceId, String entityCollectionName, long id, String entityJson) throws UnsupportedEncodingException;
+    JSONObject updateEntity(long workspaceId, String entityCollectionName, long id, String entityJson);
 
-	JSONObject updateEntities(long workspaceId, String entityCollectionName, String entityJson) throws UnsupportedEncodingException;
+	JSONObject updateEntities(long workspaceId, String entityCollectionName, String entityJson);
 
 	/**
 	 * Sends events list to MQM [PUT request].
