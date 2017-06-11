@@ -17,19 +17,19 @@ package com.hp.mqm.client.model;
 
 final public class ListItem {
 
-    private final Long id;
+    private final String id;
     private final String logicalName;
     private final String name;
     private final ListItem root;
 
-    public ListItem(Long id, String logicalName, String name, ListItem root) {
+    public ListItem(String id, String logicalName, String name, ListItem root) {
         this.id = id;
         this.name = name;
         this.logicalName = logicalName;
         this.root = root;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

@@ -226,7 +226,7 @@ public interface MqmRestClient extends BaseMqmRestClient {
 	 * @param workspaceId
 	 * @return
 	 */
-	List<ListItem> getListItems(List<Long> itemIds, long workspaceId);
+	List<ListItem> getListItems(List<String> itemIds, long workspaceId);
 
 	/**
 	 * Get metadata fields of given workspace
