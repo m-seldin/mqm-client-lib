@@ -445,10 +445,10 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 	}
 
 	private ListItem toListItem(JSONObject field) {
-		Long id = null;
+		String id = null;
 		String name = null;
 		if (field.has("id")) {
-			id = field.getLong("id");
+			id = field.getString("id");
 		}
 		if (field.has("name")) {
 			name = field.getString("name");
@@ -599,7 +599,7 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 	}
 
 	@Override
-	public List<ListItem> getListItems(List<Long> itemIds, long workspaceId) {
+	public List<ListItem> getListItems(List<String> itemIds, long workspaceId) {
 		if (itemIds == null || itemIds.size() == 0) {
 			return new LinkedList<>();
 		}
@@ -607,9 +607,9 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 			throw new IllegalArgumentException("List of itemIds is too long. Only " + DEFAULT_LIMIT + " values are allowed.");
 		}
 
-		Set<Long> itemIdsSet = new LinkedHashSet<>(itemIds);
+		Set<String> itemIdsSet = new LinkedHashSet<>(itemIds);
 		StringBuilder conditionBuilder = new StringBuilder();
-		for (Long itemId : itemIdsSet) {
+		for (String itemId : itemIdsSet) {
 			if (conditionBuilder.length() > 0) {
 				conditionBuilder.append("||");
 			}
@@ -884,9 +884,9 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 		public ListItem doCreate(JSONObject entityObject) {
 			JSONObject list_root = entityObject.optJSONObject("list_root");
 			if (list_root != null) {
-				return new ListItem(entityObject.getLong("id"), entityObject.getString("logical_name"), entityObject.getString("name"), doCreate(list_root));
+				return new ListItem(entityObject.getString("id"), entityObject.getString("logical_name"), entityObject.getString("name"), doCreate(list_root));
 			} else {
-				return new ListItem(entityObject.getLong("id"), entityObject.getString("logical_name"), entityObject.getString("name"), null);
+				return new ListItem(entityObject.getString("id"), entityObject.getString("logical_name"), entityObject.getString("name"), null);
 			}
 		}
 	}

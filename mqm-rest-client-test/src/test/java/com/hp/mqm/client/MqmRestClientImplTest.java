@@ -625,8 +625,8 @@ public class MqmRestClientImplTest {
 		Assert.assertEquals("Acceptance", acceptance.getName());
 		Assert.assertNotNull(acceptance.getRoot());
 
-		ArrayList<ListItem> expectedItems = new ArrayList<ListItem>(Arrays.asList(junit, acceptance));
-		List<Long> expectedItemsIds = new LinkedList<Long>(Arrays.asList(junit.getId(), acceptance.getId()));
+		ArrayList<ListItem> expectedItems = new ArrayList<>(Arrays.asList(junit, acceptance));
+		List<String> expectedItemsIds = new LinkedList<>(Arrays.asList(junit.getId(), acceptance.getId()));
 
 		ArrayList<ListItem> items = new ArrayList<ListItem>(client.getListItems(expectedItemsIds, WORKSPACE));
 		Assert.assertTrue(items.size() > 0);
@@ -634,7 +634,7 @@ public class MqmRestClientImplTest {
 		Comparator<ListItem> comparator = new Comparator<ListItem>() {
 			@Override
 			public int compare(ListItem left, ListItem right) {
-				return (int) (left.getId() - right.getId());
+				return (left.getId().compareTo(right.getId()));
 			}
 		};
 		Collections.sort(items, comparator);
@@ -763,7 +763,7 @@ public class MqmRestClientImplTest {
 					Assert.assertNotNull(actual.getValues());
 					Assert.assertEquals(expected.getValues().size(), actual.getValues().size());
 
-					List<Long> ids = new LinkedList<Long>();
+					List<String> ids = new LinkedList<>();
 					for (ListItem item : actual.getValues()) {
 						ids.add(item.getId());
 					}
@@ -779,7 +779,7 @@ public class MqmRestClientImplTest {
 		Assert.assertEquals(expectedFields.size(), matched);
 	}
 
-	private void assertListFieldValues(List<Long> ids, List<ListItem> listItems) {
+	private void assertListFieldValues(List<String> ids, List<ListItem> listItems) {
 		List<ListItem> foundItems = client.getListItems(ids, WORKSPACE);
 		Assert.assertEquals(ids.size(), foundItems.size());
 		int matched = 0;
