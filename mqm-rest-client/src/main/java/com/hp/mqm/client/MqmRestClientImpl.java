@@ -58,6 +58,7 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 	private static final String URI_PREFLIGHT = "analytics/ci/servers/{0}/jobs/{1}/tests-result-preflight";
 	private static final String URI_WORKSPACE_BY_JOB_AND_SERVER = PREFIX_CI + "servers/{0}/jobs/{1}/workspaceId";
 	private static final String URI_BDI_CONFIGURATION = PREFIX_BDI + "configuration";
+	private static final String URI_BDI_ACCESS_TOKEN = PREFIX_BDI + "token";
 	private static final String URI_RELEASES = "releases";
 	private static final String URI_WORKSPACES = "workspaces";
 	private static final String URI_LIST_ITEMS = "list_nodes";
@@ -71,7 +72,7 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 
 	private static final int DEFAULT_OFFSET = 0;
 	private static final int DEFAULT_LIMIT = 100;
-    private static final int MAX_GET_LIMIT = 1000;
+	private static final int MAX_GET_LIMIT = 1000;
 	private static final String CONTENT_ENCODING_GZIP = "gzip";
 
 	/**
@@ -136,6 +137,24 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 			return JSONObject.fromObject(bdiConfiguration);
 		} catch (IOException e) {
 			throw new RequestErrorException("Cannot obtain status.", e);
+		} finally {
+			HttpClientUtils.closeQuietly(response);
+		}
+	}
+
+	@Override
+	public String getBdiTokenData() {
+		HttpGet request = new HttpGet(createSharedSpaceInternalApiUri(URI_BDI_ACCESS_TOKEN));
+		HttpResponse response = null;
+		try {
+			response = execute(request);
+			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				return IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+			} else {
+				throw createRequestException("BDI token retrieval failed", response);
+			}
+		} catch (IOException e) {
+			throw new RequestErrorException("failed to parse token data response", e);
 		} finally {
 			HttpClientUtils.closeQuietly(response);
 		}
@@ -668,110 +687,110 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 		}
 	}
 
-    @Override
-    public JSONObject postEntities(long workspaceId, String entityCollectionName, String entityJson) {
-        URI uri = getEntityURI(entityCollectionName, null, null, workspaceId, null, null, null);
-        HttpPost request = new HttpPost(uri);
-        request.setHeader(HTTP.CONTENT_TYPE, "application/json");
-        request.setHeader("Accept", "application/json");
+	@Override
+	public JSONObject postEntities(long workspaceId, String entityCollectionName, String entityJson) {
+		URI uri = getEntityURI(entityCollectionName, null, null, workspaceId, null, null, null);
+		HttpPost request = new HttpPost(uri);
+		request.setHeader(HTTP.CONTENT_TYPE, "application/json");
+		request.setHeader("Accept", "application/json");
 
-        try {
-            request.setEntity(new StringEntity(entityJson));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Failed to create StringEntity :" + e.getMessage(), e);
-        }
-        HttpResponse response;
-        try {
-            response = execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-                throw new TemporarilyUnavailableException("Service not available");
-            }
-            if (statusCode != HttpStatus.SC_CREATED) {
-                throw createRequestException("Post failed", response);
-            }
-            String json = IOUtils.toString(response.getEntity().getContent());
-            return JSONObject.fromObject(json);
-        } catch (IOException e) {
-            throw new RequestErrorException("Cannot post entities", e);
-        }
-    }
+		try {
+			request.setEntity(new StringEntity(entityJson));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Failed to create StringEntity :" + e.getMessage(), e);
+		}
+		HttpResponse response;
+		try {
+			response = execute(request);
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
+				throw new TemporarilyUnavailableException("Service not available");
+			}
+			if (statusCode != HttpStatus.SC_CREATED) {
+				throw createRequestException("Post failed", response);
+			}
+			String json = IOUtils.toString(response.getEntity().getContent());
+			return JSONObject.fromObject(json);
+		} catch (IOException e) {
+			throw new RequestErrorException("Cannot post entities", e);
+		}
+	}
 
-    public List<Entity> getEntities(long workspaceId, String entityCollectionName, Collection<String> conditions, Collection<String> fields) {
-        List<Entity> result = new ArrayList<>();
-        int limit = MAX_GET_LIMIT;
-        int offset = DEFAULT_OFFSET;
-        boolean fetchedAll = false;
-        while (!fetchedAll) {
+	public List<Entity> getEntities(long workspaceId, String entityCollectionName, Collection<String> conditions, Collection<String> fields) {
+		List<Entity> result = new ArrayList<>();
+		int limit = MAX_GET_LIMIT;
+		int offset = DEFAULT_OFFSET;
+		boolean fetchedAll = false;
+		while (!fetchedAll) {
 			URI uri = getEntityURI(entityCollectionName, conditions, fields, workspaceId, offset, limit, null);
 			PagedList<Entity> found = getEntities(uri, offset, new GeneralEntityFactory());
 
-            result.addAll(found.getItems());
-            offset = offset + found.getItems().size();
-            fetchedAll = found.getItems().isEmpty() || found.getTotalCount() == result.size();
-        }
+			result.addAll(found.getItems());
+			offset = offset + found.getItems().size();
+			fetchedAll = found.getItems().isEmpty() || found.getTotalCount() == result.size();
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    @Override
-    public JSONObject updateEntity(long workspaceId, String entityCollectionName, long entityId, String entityJson) {
-        URI uri = getEntityIdURI(entityCollectionName, entityId, workspaceId);
-        return updateEntities(uri, entityJson);
-    }
+	@Override
+	public JSONObject updateEntity(long workspaceId, String entityCollectionName, long entityId, String entityJson) {
+		URI uri = getEntityIdURI(entityCollectionName, entityId, workspaceId);
+		return updateEntities(uri, entityJson);
+	}
 
-    @Override
-    public JSONObject updateEntities(long workspaceId, String entityCollectionName, String entityJson) {
-        URI uri = getEntityURI(entityCollectionName, null, null, workspaceId, null, null, null);
-        return updateEntities(uri, entityJson);
-    }
+	@Override
+	public JSONObject updateEntities(long workspaceId, String entityCollectionName, String entityJson) {
+		URI uri = getEntityURI(entityCollectionName, null, null, workspaceId, null, null, null);
+		return updateEntities(uri, entityJson);
+	}
 
-    private JSONObject updateEntities(URI uri, String entityJson) {
-        HttpPut request = new HttpPut(uri);
-        request.setHeader(HTTP.CONTENT_TYPE, "application/json");
-        request.setHeader("Accept", "application/json");
+	private JSONObject updateEntities(URI uri, String entityJson) {
+		HttpPut request = new HttpPut(uri);
+		request.setHeader(HTTP.CONTENT_TYPE, "application/json");
+		request.setHeader("Accept", "application/json");
 
-        try {
-            request.setEntity(new StringEntity(entityJson));
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Failed to create StringEntity :" + e.getMessage(), e);
-        }
-        HttpResponse response;
-        try {
-            response = execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-                throw new TemporarilyUnavailableException("Service not available");
-            }
-            if (statusCode != HttpStatus.SC_OK) {
-                throw createRequestException("Put failed", response);
-            }
-            String json = IOUtils.toString(response.getEntity().getContent());
-            return JSONObject.fromObject(json);
-        } catch (IOException e) {
-            throw new RequestErrorException("Cannot put entities to MQM.", e);
-        }
-    }
+		try {
+			request.setEntity(new StringEntity(entityJson));
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException("Failed to create StringEntity :" + e.getMessage(), e);
+		}
+		HttpResponse response;
+		try {
+			response = execute(request);
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
+				throw new TemporarilyUnavailableException("Service not available");
+			}
+			if (statusCode != HttpStatus.SC_OK) {
+				throw createRequestException("Put failed", response);
+			}
+			String json = IOUtils.toString(response.getEntity().getContent());
+			return JSONObject.fromObject(json);
+		} catch (IOException e) {
+			throw new RequestErrorException("Cannot put entities to MQM.", e);
+		}
+	}
 
-    @Override
-    public PagedList<Entity> deleteEntities(long workspaceId, String entityCollectionName, Collection<Long> entitiesIds) {
-        //query="id=3011||id=3012"
+	@Override
+	public PagedList<Entity> deleteEntities(long workspaceId, String entityCollectionName, Collection<Long> entitiesIds) {
+		//query="id=3011||id=3012"
 
-        if (entitiesIds == null || entitiesIds.isEmpty()) {
-            return null;
-        }
+		if (entitiesIds == null || entitiesIds.isEmpty()) {
+			return null;
+		}
 
-        List<String> idConditions = new ArrayList<>();
-        for (Long id : entitiesIds) {
-            idConditions.add(QueryHelper.condition("id", id));
-        }
-        String finalCondition = StringUtils.join(idConditions, "||");
+		List<String> idConditions = new ArrayList<>();
+		for (Long id : entitiesIds) {
+			idConditions.add(QueryHelper.condition("id", id));
+		}
+		String finalCondition = StringUtils.join(idConditions, "||");
 
 
-        URI uri = getEntityURI(entityCollectionName, Arrays.asList(finalCondition), null, workspaceId, null, null, null);
-        PagedList<Entity> tests = deleteEntities(uri, new GeneralEntityFactory());
-        return tests;
-    }
+		URI uri = getEntityURI(entityCollectionName, Arrays.asList(finalCondition), null, workspaceId, null, null, null);
+		PagedList<Entity> tests = deleteEntities(uri, new GeneralEntityFactory());
+		return tests;
+	}
 
 	private ByteArrayEntity createGZipEntity(InputStream inputStream) {
 		try {

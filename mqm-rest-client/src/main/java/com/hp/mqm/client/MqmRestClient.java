@@ -284,11 +284,18 @@ public interface MqmRestClient extends BaseMqmRestClient {
 	JSONObject getBdiConfiguration();
 
 	/**
+	 * Retrieves BDI access token from Octane
+	 *
+	 * @return access token as plain text
+	 */
+	String getBdiTokenData();
+
+	/**
+	 * Retrieves Octane's workspace that the specified CIJob is found in
 	 *
 	 * @param ciServerId identity of the server
 	 * @param ciJobName The job name
 	 * @return The job's workspace id if the job is part of a build context, null otherwise.
 	 */
 	List<String> getJobWorkspaceId(String ciServerId, String ciJobName);
-
 }
