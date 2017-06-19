@@ -125,7 +125,7 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 
 			int statusCode = response.getStatusLine().getStatusCode();
 			if (statusCode == HttpStatus.SC_NO_CONTENT) {
-				logger.info("BDI is not configured in Octane");
+				logger.config("BDI is not configured in Octane");
 				return null;
 			}
 
@@ -861,7 +861,7 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 				return responseBody;
 			} else {
 				if (response.getStatusLine().getStatusCode() == HttpStatus.SC_REQUEST_TIMEOUT) {
-					logger.info("expected timeout disconnection on retrieval of abridged tasks");
+					logger.config("expected timeout disconnection on retrieval of abridged tasks");
 					return null;
 				} else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
 					throw new AuthenticationException();
