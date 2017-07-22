@@ -345,14 +345,12 @@ public abstract class AbstractMqmRestClient implements BaseMqmRestClient {
 	}
 
 	private String encodeParam(String param) {
-//		try {
-			//return URLEncoder.encode(param, URI_PARAM_ENCODING).replace("+", "%20");
-			String result = new String(Base64.encodeBase64(param.getBytes()));
-			logger.log(Level.INFO,String.format("Encoded param: %s, result : %s",param,result));
-			return result;
-		//} catch (UnsupportedEncodingException e) {
-//			throw new IllegalStateException("Unsupported encoding used for URI parameter encoding.", e);
-//		}
+		try {
+
+			return URLEncoder.encode(param, URI_PARAM_ENCODING).replace("+", "%20");
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("Unsupported encoding used for URI parameter encoding.", e);
+		}
 	}
 
 	/**

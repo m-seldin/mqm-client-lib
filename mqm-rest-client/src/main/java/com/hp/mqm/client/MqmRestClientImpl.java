@@ -41,6 +41,7 @@ import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPOutputStream;
 
@@ -101,7 +102,12 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 
 	@Override
 	public Boolean isTestResultRelevant(String serverIdentity, String jobName) {
-		HttpGet request = new HttpGet(createSharedSpaceInternalApiUri(URI_PREFLIGHT, serverIdentity, jobName));
+		String result = Base64.getUrlEncoder().encodeToString(jobName.getBytes());
+		logger.log(Level.SEVERE,String.format("Job before: %s, after : %s",jobName,result));
+
+		URI getUri = createSharedSpaceInternalApiUri(URI_PREFLIGHT, serverIdentity, result);
+
+		HttpGet request = new HttpGet(getUri);
 		HttpResponse response = null;
 		try {
 			response = execute(request);
