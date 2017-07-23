@@ -35,7 +35,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HTTP;
-
+import org.apache.commons.codec.binary.Base64;
 import java.io.*;
 import java.net.URI;
 import java.text.ParseException;
@@ -102,8 +102,9 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 
 	@Override
 	public Boolean isTestResultRelevant(String serverIdentity, String jobName) {
-		String result = Base64.getUrlEncoder().encodeToString(jobName.getBytes());
-		logger.log(Level.SEVERE,String.format("Job before: %s, after : %s",jobName,result));
+
+		String result = Base64.encodeBase64String(jobName.getBytes());
+		logger.log(Level.INFO,String.format("Job name before encoding: %s, after encoding : %s",jobName,result));
 
 		URI getUri = createSharedSpaceInternalApiUri(URI_PREFLIGHT, serverIdentity, result);
 
