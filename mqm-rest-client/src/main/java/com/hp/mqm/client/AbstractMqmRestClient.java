@@ -24,7 +24,6 @@ import com.hp.mqm.client.exception.RequestException;
 import com.hp.mqm.client.exception.ServerException;
 import com.hp.mqm.client.exception.SharedSpaceNotExistException;
 import com.hp.mqm.client.model.PagedList;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.*;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
