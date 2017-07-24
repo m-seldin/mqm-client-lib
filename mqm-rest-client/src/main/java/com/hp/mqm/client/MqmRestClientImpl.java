@@ -57,6 +57,7 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 	private static final String URI_JOB_CONFIGURATION = "analytics/ci/servers/{0}/jobs/{1}/configuration";
 	private static final String URI_DELETE_NODES_TESTS = "analytics/ci/pipelines/{0}/jobs/{1}/tests";
 	private static final String URI_PREFLIGHT = "analytics/ci/servers/{0}/jobs/{1}/tests-result-preflight";
+	private static final String URI_BASE64SUPPORT = "analytics/ci/servers/tests-result-preflight-base64";
 	private static final String URI_WORKSPACE_BY_JOB_AND_SERVER = PREFIX_CI + "servers/{0}/jobs/{1}/workspaceId";
 	private static final String URI_BDI_CONFIGURATION = PREFIX_BDI + "configuration";
 	private static final String URI_BDI_ACCESS_TOKEN = PREFIX_BDI + "token";
@@ -103,13 +104,26 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 	@Override
 	public Boolean isTestResultRelevant(String serverIdentity, String jobName) {
 
-		String result = Base64.encodeBase64String(jobName.getBytes());
-		logger.log(Level.INFO,String.format("Job name before encoding: %s, after encoding : %s",jobName,result));
-
-		URI getUri = createSharedSpaceInternalApiUri(URI_PREFLIGHT, serverIdentity, result);
-
-		HttpGet request = new HttpGet(getUri);
+		URI supportsBase64Uri =createSharedSpaceInternalApiUri(URI_BASE64SUPPORT);
+		HttpGet request = new HttpGet(supportsBase64Uri);
 		HttpResponse response = null;
+		String jobNameForSending = jobName;
+		try {
+			response = execute(request);
+			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+				logger.log(Level.INFO,"Octane supports base64 encoding");
+				jobNameForSending = Base64.encodeBase64String(jobName.getBytes());
+			}
+		}catch (IOException ex){
+			logger.log(Level.INFO,"Octane does not support base64 encoding");
+		}
+
+		logger.log(Level.INFO,String.format("Job name before encoding: %s, after encoding : %s",jobName,jobNameForSending));
+
+		URI getUri = createSharedSpaceInternalApiUri(URI_PREFLIGHT, serverIdentity, jobNameForSending);
+
+		request = new HttpGet(getUri);
+		response = null;
 		try {
 			response = execute(request);
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
