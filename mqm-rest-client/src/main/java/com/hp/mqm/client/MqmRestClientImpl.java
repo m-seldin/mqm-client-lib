@@ -110,13 +110,14 @@ public class MqmRestClientImpl extends AbstractMqmRestClient implements MqmRestC
 		HttpGet request = new HttpGet(supportsBase64Uri);
 		HttpResponse response = null;
 		String jobNameForSending = jobName;
+		logger.log(Level.INFO,"Check if octane support handling of base64");
 		try {
 			response = execute(request);
 			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 				logger.log(Level.INFO,"Octane supports base64 encoding");
 				jobNameForSending = Base64.encodeBase64String(jobName.getBytes());
 			}
-		}catch (IOException ex){
+		}catch (Exception ex){
 			logger.log(Level.INFO,"Octane does not support base64 encoding");
 		}
 
